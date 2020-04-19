@@ -19,6 +19,7 @@ defmodule LocalAssistantWeb.Router do
 
     live "/", PageLive, :index
     live "/player", PlayerLive, :index
+    live "/clock", ClockLive, :index
   end
 
   # Other scopes may use custom stacks.

@@ -15,7 +15,7 @@ defmodule LocalAssistantWeb.PlayerLiveTest do
   describe "Index" do
     setup [:create_player]
 
-    test "lists all player", %{conn: conn, player: _player} do
+    test "Shows player", %{conn: conn, player: _player} do
       {:ok, _index_live, html} = live(conn, Routes.player_path(conn, :index))
 
       assert html =~ "MP3 Player"

@@ -1,0 +1,12 @@
+<section class="hero is-primary has-text-centered is-fullheight">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title is-1">
+        <%= format(@time.hour) %>:<%= format(@time.minute) %>:<%= format(@time.second) %>
+      </h1>
+      <h2 class="subtitle is-3">
+        <%= format(@time.day) %>/<%= format(@time.month) %>/<%= @time.year %>
+      </h2>
+    </div>
+  </div>
+</section>

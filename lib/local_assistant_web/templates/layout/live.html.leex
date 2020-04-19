@@ -1,3 +1,15 @@
+<nav class="navbar <%= if !is_main_page(@socket), do: "is-fixed-top" %>" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <%= if !is_main_page(@socket) do %>
+      <%= live_patch "Home", to: Routes.page_path(@socket, :index), class: "navbar-item" %>
+    <% else %>
+      <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+        <%= link "LiveDashboard", to: Routes.live_dashboard_path(@socket, :home), class: "navbar-item" %>
+      <% end %>
+    <% end %>
+  </div>
+</nav>
+
 <main role="main" class="container">
   <p class="alert alert-info" role="alert"
     phx-click="lv:clear-flash"
