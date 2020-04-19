@@ -5,7 +5,7 @@ defmodule LocalAssistantWeb.PageLiveTest do
 
   test "disconnected and connected render", %{conn: conn} do
     {:ok, page_live, disconnected_html} = live(conn, "/")
-    assert disconnected_html =~ "Welcome to Local Assistant!"
-    assert render(page_live) =~ "Welcome to Local Assistant!"
+    assert disconnected_html =~ "Visit"
+    assert render(page_live) =~ "Visit"
   end
 end

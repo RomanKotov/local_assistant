@@ -10,6 +10,16 @@
     <script defer type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
   </head>
   <body>
+    <nav class="navbar" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <%= live_patch to: Routes.page_path(@conn, :index), class: "navbar-item" do %>
+          <%= gettext "Welcome to %{name}!", name: "Local Assistant" %>
+        <% end %>
+        <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+          <%= link "LiveDashboard", to: Routes.live_dashboard_path(@conn, :home), class: "navbar-item" %>
+        <% end %>
+      </div>
+    </nav>
     <%= @inner_content %>
   </body>
 </html>
