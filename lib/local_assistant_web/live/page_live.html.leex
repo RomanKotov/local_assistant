@@ -4,7 +4,7 @@
       <%= live_render(@socket, page.component, id: index, session: %{"action" => "preview"}) %>
     </div>
     <%= live_patch to: page.route do %>
-      <div class="column is-1">
+      <div class="column is-narrow-mobile">
         <div class="notification is-success">
           <p class="subtitle is-3">Visit</p>
         </div>
