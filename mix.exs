@@ -33,7 +33,7 @@ defmodule LocalAssistant.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.0-rc.0", override: true},
+      {:phoenix, "~> 1.5.0"},
       {:phoenix_live_view, "~> 0.12.0"},
       {:floki, ">= 0.0.0", only: :test},
       {:phoenix_html, "~> 2.11"},
