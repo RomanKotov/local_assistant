@@ -1,6 +1,7 @@
 const {spawn} = require('child_process');
 
-const command = spawn('cat');
+const [program, ...args] = process.argv.slice(2);
+const command = spawn(program, args);
 
 command.on("close", code => process.exit(code));
 
