@@ -16,6 +16,7 @@ defmodule LocalAssistantWeb.ClockLive do
     Phoenix.View.render(LocalAssistantWeb.ClockLiveView, "#{action}.html", assigns)
   end
 
+  @spec set_time(Socket.t) :: Socket.t
   defp set_time(socket) do
     schedule_tick()
     time = :calendar.local_time() |> NaiveDateTime.from_erl!()
