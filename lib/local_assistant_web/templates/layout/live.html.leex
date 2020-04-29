@@ -1,4 +1,7 @@
-<nav class="navbar <%= if !is_main_page(@socket), do: "is-fixed-top" %>" role="navigation" aria-label="main navigation">
+<nav
+  class="navbar <%= if !is_main_page(@socket), do: "is-fixed-top" %>"
+  role="navigation"
+  aria-label="main navigation">
   <div class="navbar-brand">
     <%= if !is_main_page(@socket) do %>
       <%= live_patch "Home", to: Routes.page_path(@socket, :index), class: "navbar-item" %>
@@ -7,6 +10,11 @@
         <%= link "LiveDashboard", to: Routes.live_dashboard_path(@socket, :home), class: "navbar-item" %>
       <% end %>
     <% end %>
+    <div class="navbar-item">
+      <a class="button is-primary", phx-hook="ToggleScreen">
+        <strong>Toggle Fullscreen</strong>
+      </a>
+    </div>
   </div>
 </nav>
 
