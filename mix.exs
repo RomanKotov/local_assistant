@@ -33,8 +33,8 @@ defmodule LocalAssistant.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.5.0"},
-      {:phoenix_live_view, "~> 0.12.0"},
+      {:phoenix, "~> 1.5"},
+      {:phoenix_live_view, "~> 0.12"},
       {:floki, ">= 0.0.0", only: :test},
       {:phoenix_html, "~> 2.11"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -43,7 +43,8 @@ defmodule LocalAssistant.MixProject do
       {:telemetry_poller, "~> 0.4"},
       {:gettext, "~> 0.11"},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"}
+      {:plug_cowboy, "~> 2.0"},
+      {:websockex, "~> 0.4"}
     ]
   end
 
