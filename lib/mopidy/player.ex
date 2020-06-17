@@ -1,8 +1,6 @@
 defmodule Mopidy.Player do
   use GenServer
-  @url "http://localhost:6680/mopidy/ws"
-
-  def start_link(url \\ @url, opts \\ []) do
+  def start_link(url, opts \\ []) do
     GenServer.start_link(__MODULE__, %{url: url, conn: nil, requests: %{}, id: 1}, opts)
   end
 

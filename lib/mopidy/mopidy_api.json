@@ -1,0 +1,26 @@
+{
+    "core.get_uri_schemes": {
+        "description": "Get list of URI schemes we can handle",
+        "params": []
+    },
+    "core.get_version": {
+        "description": "Get version of the Mopidy core API",
+        "params": []
+    },
+    "core.history.get_history": {
+        "description": "Get the track history.\n\nThe timestamps are milliseconds since epoch.\n\n:returns: the track history\n:rtype: list of (timestamp, :class:`mopidy.models.Ref`) tuples",
+        "params": []
+    },
+    "core.library.get_distinct": {
+        "description": "List distinct values for a given field from the library.\n\nThis has mainly been added to support the list commands the MPD\nprotocol supports in a more sane fashion. Other frontends are not\nrecommended to use this method.\n\n:param string field: One of ``track``, ``artist``, ``albumartist``,\n    ``album``, ``composer``, ``performer``, ``date`` or ``genre``.\n:param dict query: Query to use for limiting results, see\n    :meth:`search` for details about the query format.\n:rtype: set of values corresponding to the requested field type.\n\n.. versionadded:: 1.0",
+        "params": [
+            {
+                "name": "field"
+            },
+            {
+                "name": "query",
+                "default": null
+            }
+        ]
+    }
+}
