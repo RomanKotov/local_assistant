@@ -1,5 +1,6 @@
 defmodule Mopidy.Player do
   use GenServer
+
   def start_link(url, opts \\ []) do
     GenServer.start_link(__MODULE__, %{url: url, conn: nil, requests: %{}, id: 1}, opts)
   end
@@ -32,5 +33,10 @@ defmodule Mopidy.Player do
   def handle_info({:message, data = %{"id" => id}}, state = %{requests: requests}) do
     GenServer.reply(Map.get(requests, id), data["result"])
     {:noreply, %{state | requests: Map.delete(requests, id)}}
+  end
+
+  def handle_info({:message, data = %{"event" => _event}}, state) do
+    IO.inspect(data)
+    {:noreply, state}
   end
 end

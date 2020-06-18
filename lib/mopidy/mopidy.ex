@@ -3,14 +3,6 @@ defmodule Mopidy do
   Mopidy represents connection to Mopidy player
   """
 
-  def api_json() do
-    with path <- Path.join(Path.dirname(__ENV__.file), "mopidy_api.json"),
-         {:ok, body} <- File.read(path),
-         {:ok, json} <- Jason.decode(body) do
-      json
-    end
-  end
-
   def module_information() do
     key_fn = fn {key, _value} ->
       key
@@ -30,16 +22,38 @@ defmodule Mopidy do
       }
     end
 
-    api_json() |> Enum.group_by(key_fn, value_fn)
+    with path <- Path.join(Path.dirname(__ENV__.file), "mopidy_api.json"),
+         {:ok, body} <- File.read(path),
+         {:ok, json} <- Jason.decode(body) do
+      json |> Enum.group_by(key_fn, value_fn)
+    end
   end
 
   defmacro generate_api() do
     generate_function_ast = fn meta ->
-      IO.inspect(meta)
+      arguments =
+        meta.params
+        |> Enum.map(fn
+          %{"default" => default, "name" => name} ->
+            {:\\, [], [{String.to_atom(name), [], nil}, default]}
+
+          %{"name" => name} ->
+            {String.to_atom(name), [], nil}
+        end)
+
+      params =
+        for %{"name" => name} <- meta.params do
+          Macro.var(String.to_atom(name), nil)
+        end
+
       quote do
         @doc unquote(meta.description)
-        def unquote(String.to_atom(meta.method))() do
-          Mopidy.Player.command(unquote(__CALLER__.module), unquote(meta.api_method))
+        def unquote(String.to_atom(meta.method))(unquote_splicing(arguments)) do
+          Mopidy.Player.command(
+            unquote(__CALLER__.module),
+            unquote(meta.api_method),
+            [unquote_splicing(params)]
+          )
         end
       end
     end
@@ -68,10 +82,9 @@ defmodule Mopidy do
       @doc "Connect to an instance"
       def connect(url \\ @url) do
         {:ok, _pid} = Mopidy.Player.start_link(url, name: unquote(__CALLER__.module))
-        :ok
       end
 
-      unquote ast
+      unquote(ast)
     end
   end
 end
