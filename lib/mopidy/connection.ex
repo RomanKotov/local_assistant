@@ -14,4 +14,9 @@ defmodule Mopidy.Connection do
     frame = {:text, Jason.encode!(data)}
     WebSockex.send_frame(pid, frame)
   end
+
+  def handle_disconnect(_conn, state=%{pid: pid}) do
+    Process.exit(pid, :disconnected)
+    {:ok, state}
+  end
 end
