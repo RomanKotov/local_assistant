@@ -55,7 +55,7 @@ defmodule Mopidy.Player do
 
     data = for key <- keys, into: %{} do
       value = result["#{key}"]
-      {key, value}
+      {key, parse_result(value)}
     end
 
     struct(model, data)
