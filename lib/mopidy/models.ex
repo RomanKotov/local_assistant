@@ -142,4 +142,34 @@ defmodule Mopidy.Models do
             albums: list(Mopidy.Player.Album.t()) | nil
           }
   end
+
+  @mapping for module <- [
+                 Ref,
+                 Track,
+                 Album,
+                 Artist,
+                 Playlist,
+                 Image,
+                 TlTrack,
+                 SearchResult
+               ],
+               into: %{},
+               do: {
+                 module |> Module.split() |> List.last(),
+                 %{
+                   keys: module |> struct() |> Map.keys() |> Enum.filter(&(&1 != :__struct__)),
+                   module: module
+                 }
+               }
+
+  defp deserialize(model_name, data) do
+    %{module: module, keys: keys} = @mapping |> Map.fetch!(model_name)
+
+    module_data = for key <- keys, do: {key, data["#{key}"] |> deserialize}
+    struct(module, module_data)
+  end
+
+  def deserialize(result) when is_list(result), do: result |> Enum.map(&deserialize/1)
+  def deserialize(result = %{"__model__" => model_name}), do: deserialize(model_name, result)
+  def deserialize(result), do: result
 end
