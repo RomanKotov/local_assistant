@@ -30,11 +30,12 @@ defmodule Mopidy.Player do
   end
 
   @impl true
-  def handle_info({:message, data = %{"id" => id}}, state = %{requests: requests}) do
-    result = data["result"] |> parse_result()
-    GenServer.reply(Map.get(requests, id), result)
-    {:noreply, %{state | requests: Map.delete(requests, id)}}
-  end
+  def handle_info({:message, %{"id" => id, "result" => result}}, state),
+    do: reply(state, id, {:ok, parse_result(result)})
+
+  @impl true
+  def handle_info({:message, %{"id" => id, "error" => error}}, state),
+    do: reply(state, id, {:error, error})
 
   def handle_info({:message, data = %{"event" => _event}}, state) do
     IO.inspect(data)
@@ -53,10 +54,11 @@ defmodule Mopidy.Player do
     model = Map.fetch!(available_models(), model_name) |> struct
     keys = model |> Map.keys() |> Enum.filter(&(&1 != :__struct__))
 
-    data = for key <- keys, into: %{} do
-      value = result["#{key}"]
-      {key, parse_result(value)}
-    end
+    data =
+      for key <- keys, into: %{} do
+        value = result["#{key}"]
+        {key, parse_result(value)}
+      end
 
     struct(model, data)
   end
@@ -73,5 +75,10 @@ defmodule Mopidy.Player do
         {key, module}
       end
     end
+  end
+
+  defp reply(state = %{requests: requests}, id, data) do
+    GenServer.reply(Map.get(requests, id), data)
+    {:noreply, %{state | requests: Map.delete(requests, id)}}
   end
 end
