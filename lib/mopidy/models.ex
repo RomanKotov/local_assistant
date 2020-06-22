@@ -116,6 +116,12 @@ defmodule Mopidy.Models do
     ]
   )
 
+  def deserialize(result) when is_map(result) do
+    for {key, value} <- result, into: %{} do
+      {key, deserialize(value)}
+    end
+  end
+
   def deserialize(result) when is_list(result), do: result |> Enum.map(&deserialize/1)
   def deserialize(result), do: result
 end
