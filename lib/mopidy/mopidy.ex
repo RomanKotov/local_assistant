@@ -84,6 +84,10 @@ defmodule Mopidy do
         {:ok, _pid} = Mopidy.Player.start_link(url, name: unquote(__CALLER__.module))
       end
 
+      def disconnect() do
+        send(unquote(__CALLER__.module), :kill)
+      end
+
       unquote(ast)
     end
   end
