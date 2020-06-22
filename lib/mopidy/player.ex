@@ -2,7 +2,19 @@ defmodule Mopidy.Player do
   use GenServer
 
   def start_link(url, opts \\ []) do
-    GenServer.start_link(__MODULE__, %{url: url, conn: nil, requests: %{}, id: 1}, opts)
+    event_callback = Keyword.get(opts, :on_event, &IO.inspect/1)
+
+    GenServer.start_link(
+      __MODULE__,
+      %{
+        url: url,
+        conn: nil,
+        requests: %{},
+        on_event: event_callback,
+        id: 1
+      },
+      opts
+    )
   end
 
   def command(pid, method, params \\ []) do
@@ -37,8 +49,8 @@ defmodule Mopidy.Player do
   def handle_info({:message, %{"id" => id, "error" => error}}, state),
     do: reply(state, id, {:error, error})
 
-  def handle_info({:message, data = %{"event" => _event}}, state) do
-    IO.inspect(data)
+  def handle_info({:message, data = %{"event" => _event}}, state = %{on_event: event_callback}) do
+    event_callback.(data)
     {:noreply, state}
   end
 
