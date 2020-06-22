@@ -43,7 +43,7 @@ defmodule Mopidy do
 
       params =
         for %{"name" => name} <- meta.params do
-          Macro.var(String.to_atom(name), nil)
+          {name, Macro.var(String.to_atom(name), nil)}
         end
 
       quote do
@@ -52,7 +52,7 @@ defmodule Mopidy do
           Mopidy.Player.command(
             unquote(__CALLER__.module),
             unquote(meta.api_method),
-            [unquote_splicing(params)]
+            %{unquote_splicing(params)}
           )
         end
       end
