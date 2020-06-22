@@ -8,6 +8,15 @@ defmodule Mopidy.Models.Generator do
         defstruct unquote(model_keys)
 
         @type t() :: %__MODULE__{unquote_splicing(body)}
+
+        defimpl Jason.Encoder, for: __MODULE__ do
+          def encode(data, opts) do
+            data
+            |> Map.from_struct()
+            |> Map.put("__model__", unquote(model_name_str))
+            |> Jason.Encode.map(opts)
+          end
+        end
       end
 
       def deserialize(data = %{"__model__" => unquote(model_name_str)}) do
