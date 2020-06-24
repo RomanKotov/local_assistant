@@ -48,9 +48,9 @@ defmodule MopidyWS do
 
       quote do
         @doc unquote(meta.description)
-        def unquote(String.to_atom(meta.method))(unquote_splicing(arguments)) do
+        def unquote(String.to_atom(meta.method))(pid, unquote_splicing(arguments)) do
           MopidyWS.Player.command(
-            unquote(__CALLER__.module),
+            pid,
             unquote(meta.api_method),
             %{unquote_splicing(params)}
           )
@@ -79,13 +79,13 @@ defmodule MopidyWS do
     quote do
       @url "http://localhost:6680/mopidy/ws"
 
-      @doc "Connect to an instance"
-      def connect(url \\ @url) do
-        {:ok, _pid} = MopidyWS.Player.start_link(url, name: unquote(__CALLER__.module))
+      def start_link(opts \\ []) do
+        url = opts |> Keyword.get(:url, @url)
+        {:ok, _pid} = MopidyWS.Player.start_link(url, opts)
       end
 
-      def disconnect() do
-        send(unquote(__CALLER__.module), :kill)
+      def disconnect(pid) do
+        send(pid, :kill)
       end
 
       unquote(ast)
