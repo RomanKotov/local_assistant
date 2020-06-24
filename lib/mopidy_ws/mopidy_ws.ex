@@ -1,4 +1,4 @@
-defmodule Mopidy do
+defmodule MopidyWS do
   @moduledoc """
   Mopidy represents connection to Mopidy player
   """
@@ -22,7 +22,7 @@ defmodule Mopidy do
       }
     end
 
-    with path <- Path.join(Path.dirname(__ENV__.file), "mopidy_api.json"),
+    with path <- Path.join(Path.dirname(__ENV__.file), "api.json"),
          {:ok, body} <- File.read(path),
          {:ok, json} <- Jason.decode(body) do
       json |> Enum.group_by(key_fn, value_fn)
@@ -49,7 +49,7 @@ defmodule Mopidy do
       quote do
         @doc unquote(meta.description)
         def unquote(String.to_atom(meta.method))(unquote_splicing(arguments)) do
-          Mopidy.Player.command(
+          MopidyWS.Player.command(
             unquote(__CALLER__.module),
             unquote(meta.api_method),
             %{unquote_splicing(params)}
@@ -81,7 +81,7 @@ defmodule Mopidy do
 
       @doc "Connect to an instance"
       def connect(url \\ @url) do
-        {:ok, _pid} = Mopidy.Player.start_link(url, name: unquote(__CALLER__.module))
+        {:ok, _pid} = MopidyWS.Player.start_link(url, name: unquote(__CALLER__.module))
       end
 
       def disconnect() do

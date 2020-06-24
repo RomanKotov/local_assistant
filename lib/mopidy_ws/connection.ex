@@ -1,4 +1,4 @@
-defmodule Mopidy.Connection do
+defmodule MopidyWS.Connection do
   use WebSockex
 
   def start_link(url, opts \\ []) do

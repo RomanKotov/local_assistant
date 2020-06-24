@@ -1,13 +1,13 @@
-defmodule Mopidy.Models.Generator do
-  defmacro defmodel(model_name, do: body) do
-    model_keys = body |> Keyword.keys()
+defmodule MopidyWS.Models.Generator do
+  defmacro defmodel(model_name, fields: fields) do
+    model_keys = fields |> Keyword.keys()
     model_name_str = model_name |> Macro.to_string()
 
     quote do
       defmodule unquote(model_name) do
         defstruct unquote(model_keys)
 
-        @type t() :: %__MODULE__{unquote_splicing(body)}
+        @type t() :: %__MODULE__{unquote_splicing(fields)}
 
         defimpl Jason.Encoder, for: __MODULE__ do
           def encode(data, opts) do
@@ -31,11 +31,11 @@ defmodule Mopidy.Models.Generator do
   end
 end
 
-defmodule Mopidy.Models do
-  import Mopidy.Models.Generator, only: [defmodel: 2]
+defmodule MopidyWS.Models do
+  import MopidyWS.Models.Generator, only: [defmodel: 2]
 
   defmodel(Ref,
-    do: [
+    fields: [
       name: String.t() | nil,
       type: String.t() | nil,
       uri: String.t() | nil
@@ -43,13 +43,13 @@ defmodule Mopidy.Models do
   )
 
   defmodel(Track,
-    do: [
+    fields: [
       uri: String.t() | nil,
       name: String.t() | nil,
-      artists: list(Mopidy.Models.Artist.t()),
-      album: Mopidy.Models.Album.t() | nil,
-      composers: list(Mopidy.Models.Artist.t()),
-      performers: list(Mopidy.Models.Artist.t()),
+      artists: list(MopidyWS.Models.Artist.t()),
+      album: MopidyWS.Models.Album.t() | nil,
+      composers: list(MopidyWS.Models.Artist.t()),
+      performers: list(MopidyWS.Models.Artist.t()),
       genre: String.t() | nil,
       track_no: integer() | nil,
       disc_no: integer() | nil,
@@ -63,10 +63,10 @@ defmodule Mopidy.Models do
   )
 
   defmodel(Album,
-    do: [
+    fields: [
       uri: String.t() | nil,
       name: String.t() | nil,
-      artists: list(Mopidy.Models.Artist.t()),
+      artists: list(MopidyWS.Models.Artist.t()),
       num_tracks: integer() | nil,
       num_discs: integer() | nil,
       date: String.t() | nil,
@@ -75,7 +75,7 @@ defmodule Mopidy.Models do
   )
 
   defmodel(Artist,
-    do: [
+    fields: [
       uri: String.t() | nil,
       name: String.t() | nil,
       shortname: String.t() | nil,
@@ -84,16 +84,16 @@ defmodule Mopidy.Models do
   )
 
   defmodel(Playlist,
-    do: [
+    fields: [
       uri: String.t() | nil,
       name: String.t() | nil,
-      tracks: list(Mopidy.Player.Track.t()) | nil,
+      tracks: list(MopidyWS.Models.Track.t()) | nil,
       last_modified: integer() | nil
     ]
   )
 
   defmodel(Image,
-    do: [
+    fields: [
       uri: String.t() | nil,
       width: integer() | nil,
       height: integer() | nil
@@ -101,18 +101,18 @@ defmodule Mopidy.Models do
   )
 
   defmodel(TlTrack,
-    do: [
+    fields: [
       tlid: integer() | nil,
-      track: Mopidy.Player.Track.t() | nil
+      track: MopidyWS.Models.Track.t() | nil
     ]
   )
 
   defmodel(SearchResult,
-    do: [
+    fields: [
       uri: String.t() | nil,
-      tracks: list(Mopidy.Player.Track.t()) | nil,
-      artists: list(Mopidy.Player.Artist.t()) | nil,
-      albums: list(Mopidy.Player.Album.t()) | nil
+      tracks: list(MopidyWS.Models.Track.t()) | nil,
+      artists: list(MopidyWS.Models.Artist.t()) | nil,
+      albums: list(MopidyWS.Models.Album.t()) | nil
     ]
   )
 

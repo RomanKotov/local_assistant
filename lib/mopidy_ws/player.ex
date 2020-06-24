@@ -1,4 +1,4 @@
-defmodule Mopidy.Player do
+defmodule MopidyWS.Player do
   use GenServer
 
   def start_link(url, opts \\ []) do
@@ -23,7 +23,7 @@ defmodule Mopidy.Player do
 
   @impl true
   def init(state = %{url: url}) do
-    {:ok, conn} = Mopidy.Connection.start_link(url)
+    {:ok, conn} = MopidyWS.Connection.start_link(url)
     {:ok, %{state | conn: conn}}
   end
 
@@ -36,21 +36,21 @@ defmodule Mopidy.Player do
       "params" => params
     }
 
-    Mopidy.Connection.send_message(state.conn, message)
+    MopidyWS.Connection.send_message(state.conn, message)
 
     {:noreply, %{state | id: id + 1, requests: Map.put(requests, id, from)}}
   end
 
   @impl true
   def handle_info({:message, %{"id" => id, "result" => result}}, state),
-    do: reply(state, id, {:ok, Mopidy.Models.deserialize(result)})
+    do: reply(state, id, {:ok, MopidyWS.Models.deserialize(result)})
 
   @impl true
   def handle_info({:message, %{"id" => id, "error" => error}}, state),
     do: reply(state, id, {:error, error})
 
   def handle_info({:message, data = %{"event" => _event}}, state = %{on_event: event_callback}) do
-    event_callback.(data)
+    data |> MopidyWS.Models.deserialize() |> event_callback.()
     {:noreply, state}
   end
 
