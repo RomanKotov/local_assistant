@@ -79,7 +79,7 @@ defmodule MopidyWS do
     quote do
       @url "http://localhost:6680/mopidy/ws"
 
-      def start_link(opts \\ []) do
+      def connect(opts \\ []) do
         url = opts |> Keyword.get(:url, @url)
         {:ok, _pid} = MopidyWS.Player.start_link(url, opts)
       end

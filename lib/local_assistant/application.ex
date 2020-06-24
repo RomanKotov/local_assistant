@@ -12,9 +12,10 @@ defmodule LocalAssistant.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: LocalAssistant.PubSub},
       # Start the Endpoint (http/https)
-      LocalAssistantWeb.Endpoint
+      LocalAssistantWeb.Endpoint,
       # Start a worker by calling: LocalAssistant.Worker.start_link(arg)
       # {LocalAssistant.Worker, arg}
+      {LocalAssistant.Player, name: LocalAssistant.Player}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
