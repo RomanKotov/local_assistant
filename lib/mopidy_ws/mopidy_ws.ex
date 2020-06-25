@@ -77,15 +77,12 @@ defmodule MopidyWS do
     ast = module_information() |> Enum.map(generate_module_ast)
 
     quote do
-      @url "http://localhost:6680/mopidy/ws"
-
-      def connect(opts \\ []) do
-        url = opts |> Keyword.get(:url, @url)
-        {:ok, _pid} = MopidyWS.Player.start_link(url, opts)
+      def connect(url, opts \\ []) do
+        MopidyWS.Player.start_link(url, opts)
       end
 
       def disconnect(pid) do
-        send(pid, :kill)
+        Process.exit(pid, :disconnected)
       end
 
       unquote(ast)

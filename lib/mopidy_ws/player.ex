@@ -23,8 +23,10 @@ defmodule MopidyWS.Player do
 
   @impl true
   def init(state = %{url: url}) do
-    {:ok, conn} = MopidyWS.Connection.start_link(url)
-    {:ok, %{state | conn: conn}}
+    case MopidyWS.Connection.start_link(url, handle_initial_conn_failure: true) do
+      {:ok, conn} -> {:ok, %{state | conn: conn}}
+      {:error, reason} -> {:stop, reason}
+    end
   end
 
   @impl true
