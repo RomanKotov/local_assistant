@@ -1,7 +1,7 @@
 defmodule LocalAssistant.Player.State do
   defstruct [
     state: "stopped",
-    track: nil,
+    track: %MopidyWS.Models.Track{},
     volume: 0,
     position: 0
   ]

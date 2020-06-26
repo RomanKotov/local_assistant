@@ -1,3 +1,9 @@
 <div class="notification has-text-centered">
-  <p class="title is-4">Preview Player</p>
+  <p class="title is-4"><%= @player.track.name %></p>
+  <button class="button is-primary is-large" phx-click="toggle_state">
+    <span class="icon is-large">
+      <i class="fas fa-<%= if @player.state == "playing", do: "pause", else: "play" %>"></i>
+    </span>
+  </button>
+  <progress class="progress is-primary" value="<%= @player.position %>" max="<%= @player.track.length %>"><%= @player.position %></progress>
 </div>

@@ -1,4 +1,5 @@
 defmodule LocalAssistant.Player do
+  @topic "player_updates"
   @url "http://localhost:6680/mopidy/ws"
   alias MopidyWS.API
   use GenServer
@@ -22,6 +23,12 @@ defmodule LocalAssistant.Player do
   def disconnect(), do: GenServer.call(__MODULE__, :disconnect)
 
   def process_event(event), do: GenServer.call(__MODULE__, {:event, event})
+
+  def subscribe(), do: LocalAssistantWeb.Endpoint.subscribe(@topic)
+
+  def get_state(), do: GenServer.call(__MODULE__, :get_state)
+
+  def toggle_state(), do: GenServer.call(__MODULE__, :toggle_state)
 
   @impl true
   def init(state) do
@@ -51,6 +58,9 @@ defmodule LocalAssistant.Player do
   end
 
   @impl true
+  def handle_call(:get_state, _, state = %{player: player}), do: {:reply, player, state}
+
+  @impl true
   def handle_call({:event, event}, _, state) do
     result = event |> handle_event()
 
@@ -60,7 +70,18 @@ defmodule LocalAssistant.Player do
         state.player |> Map.merge(result) |> Map.from_struct()
       )
 
-    {:reply, new_player, %{state | player: new_player}}
+    {:reply, new_player, update_player(state, new_player)}
+  end
+
+  @impl true
+  def handle_call(:toggle_state, _, state = %{pid: pid, player: player}) do
+    {:ok, response} =
+      case player.state do
+        "playing" -> MopidyWS.API.Playback.pause(pid)
+        _ -> MopidyWS.API.Playback.play(pid)
+      end
+
+    {:reply, response, state}
   end
 
   @impl true
@@ -81,7 +102,7 @@ defmodule LocalAssistant.Player do
       refresh_state()
     end
 
-    {:noreply, %{state | player: player}}
+    {:noreply, update_player(state, player)}
   end
 
   def handle_info({:EXIT, _pid, :disconnected}, state), do: {:noreply, %{state | pid: nil}}
@@ -111,11 +132,21 @@ defmodule LocalAssistant.Player do
     %{state: state}
   end
 
-  def handle_event(%{"tl_track" => track, "time_position" => position}),
-    do: %{track: track, position: position}
+  def handle_event(%{
+        "tl_track" => %MopidyWS.Models.TlTrack{track: track},
+        "time_position" => position
+      }),
+      do: %{track: track, position: position}
 
   def handle_event(%{"event" => "seeked", "time_position" => position}),
     do: %{position: position}
 
   def handle_event(_), do: %{}
+
+  def update_player(state, player = %{track: track}) do
+    player = if is_nil(track), do: %{player | track: %MopidyWS.Models.Track{}}, else: player
+
+    LocalAssistantWeb.Endpoint.broadcast!(@topic, "player_state", player)
+    %{state | player: player}
+  end
 end
