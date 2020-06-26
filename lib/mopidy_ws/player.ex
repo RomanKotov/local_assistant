@@ -1,9 +1,7 @@
 defmodule MopidyWS.Player do
   use GenServer
 
-  def start_link(url, opts \\ []) do
-    event_callback = Keyword.get(opts, :on_event, &IO.inspect/1)
-
+  def start_link(url, event_callback \\ &IO.inspect/1, opts \\ []) do
     GenServer.start_link(
       __MODULE__,
       %{

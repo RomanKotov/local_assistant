@@ -8,7 +8,7 @@ defmodule LocalAssistant.Player do
       __MODULE__,
       %{
         pid: nil,
-        player: %{status: "stopped", track: nil}
+        player: %LocalAssistant.Player.State{}
       },
       opts
     )
@@ -19,9 +19,9 @@ defmodule LocalAssistant.Player do
     GenServer.call(__MODULE__, {:connect, url})
   end
 
-  def disconnect() do
-    GenServer.call(__MODULE__, :disconnect)
-  end
+  def disconnect(), do: GenServer.call(__MODULE__, :disconnect)
+
+  def process_event(event), do: GenServer.call(__MODULE__, {:event, event})
 
   @impl true
   def init(state) do
@@ -40,7 +40,7 @@ defmodule LocalAssistant.Player do
 
   @impl true
   def handle_call(:disconnect, _, state = %{pid: pid}) do
-    MopidyWS.API.disconnect(pid)
+    Process.exit(pid, :disconnected)
     {:reply, :ok, %{state | pid: nil}}
   end
 
@@ -51,17 +51,33 @@ defmodule LocalAssistant.Player do
   end
 
   @impl true
+  def handle_call({:event, event}, _, state) do
+    result = event |> handle_event()
+
+    new_player =
+      struct(
+        LocalAssistant.Player.State,
+        state.player |> Map.merge(result) |> Map.from_struct()
+      )
+
+    {:reply, new_player, %{state | player: new_player}}
+  end
+
+  @impl true
   def handle_info(:refresh_state, state = %{pid: nil}), do: {:noreply, state}
 
   @impl true
   def handle_info(:refresh_state, state = %{pid: pid, player: player}) do
-    {:ok, status} = pid |> API.Playback.get_state()
-    player = %{player | status: status}
+    {:ok, player_state} = pid |> API.Playback.get_state()
+    player = %{player | state: player_state}
 
     {:ok, track} = pid |> API.Playback.get_current_track()
     player = %{player | track: track}
 
-    if status == "playing" do
+    {:ok, position} = pid |> API.Playback.get_time_position()
+    player = %{player | position: position}
+
+    if player_state == "playing" do
       refresh_state()
     end
 
@@ -75,7 +91,7 @@ defmodule LocalAssistant.Player do
   end
 
   defp connect_to_player(state, url) do
-    case MopidyWS.API.connect(url) do
+    case MopidyWS.Player.start_link(url, &process_event/1) do
       {:ok, pid} ->
         refresh_state()
         {:ok, %{state | pid: pid}}
@@ -84,4 +100,22 @@ defmodule LocalAssistant.Player do
         {result, state}
     end
   end
+
+  def handle_event(%{"event" => "volume_changed", "volume" => volume}), do: %{volume: volume}
+
+  def handle_event(%{"event" => "playback_state_changed", "new_state" => state}) do
+    if state == "playing" do
+      refresh_state()
+    end
+
+    %{state: state}
+  end
+
+  def handle_event(%{"tl_track" => track, "time_position" => position}),
+    do: %{track: track, position: position}
+
+  def handle_event(%{"event" => "seeked", "time_position" => position}),
+    do: %{position: position}
+
+  def handle_event(_), do: %{}
 end

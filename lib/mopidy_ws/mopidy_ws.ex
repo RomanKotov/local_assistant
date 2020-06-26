@@ -77,14 +77,6 @@ defmodule MopidyWS do
     ast = module_information() |> Enum.map(generate_module_ast)
 
     quote do
-      def connect(url, opts \\ []) do
-        MopidyWS.Player.start_link(url, opts)
-      end
-
-      def disconnect(pid) do
-        Process.exit(pid, :disconnected)
-      end
-
       unquote(ast)
     end
   end
