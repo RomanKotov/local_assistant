@@ -30,6 +30,19 @@ defmodule LocalAssistant.Player do
 
   def toggle_state(), do: GenServer.call(__MODULE__, :toggle_state)
 
+  def browse(uri),
+    do: command(MopidyWS.API.Library, :browse, [uri])
+
+  def play(uri) do
+    # command(MopidyWS.API.Tracklist, :clear, [])
+    [%MopidyWS.Models.TlTrack{tlid: tlid}] =
+      command(MopidyWS.API.Tracklist, :add, [nil, nil, [uri]])
+    command(MopidyWS.API.Playback, :play, [nil, tlid])
+  end
+
+  defp command(module, function, args),
+    do: GenServer.call(__MODULE__, {:command, {module, function, args}})
+
   @impl true
   def init(state) do
     Process.flag(:trap_exit, true)
@@ -80,6 +93,14 @@ defmodule LocalAssistant.Player do
         "playing" -> MopidyWS.API.Playback.pause(pid)
         _ -> MopidyWS.API.Playback.play(pid)
       end
+
+    {:reply, response, state}
+  end
+
+  @impl true
+  def handle_call({:command, {module, function, args}}, _, state = %{pid: pid})
+      when is_list(args) do
+    {:ok, response} = apply(module, function, [pid | args])
 
     {:reply, response, state}
   end

@@ -7,6 +7,7 @@ defmodule LocalAssistantWeb.PlayerLive do
       socket
       |> assign(action: Map.get(session, "action", "index"))
       |> assign(player: LocalAssistant.Player.get_state())
+      |> load_tracks(nil)
 
     if connected?(socket) do
       LocalAssistant.Player.subscribe()
@@ -30,4 +31,17 @@ defmodule LocalAssistantWeb.PlayerLive do
     LocalAssistant.Player.toggle_state()
     {:noreply, socket}
   end
+
+  @impl true
+  def handle_event("open_folder", %{"uri" => uri}, socket) do
+    {:noreply, load_tracks(socket, uri)}
+  end
+
+  @impl true
+  def handle_event("play_file", %{"uri" => uri}, socket) do
+    LocalAssistant.Player.play(uri)
+    {:noreply, load_tracks(socket, nil)}
+  end
+
+  defp load_tracks(socket, uri), do: socket |> assign(tracks: LocalAssistant.Player.browse(uri))
 end

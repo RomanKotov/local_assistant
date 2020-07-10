@@ -4,6 +4,24 @@
       <h1 class="title is-1">
         MP3 Player
       </h1>
+      <div class="subtitle">
+        <ul class="menu-list">
+          <%= for track <- @tracks do %>
+            <li>
+              <button
+                class="button"
+                phx-click="<%= if track.type == "directory", do: "open_folder", else: "play_file" %>"
+                phx-value-uri="<%= track.uri %>"
+              >
+                <span class="icon">
+                  <i class="fas fa-<%= if track.type == "directory", do: "folder", else: "file" %>"></i>
+                </span>
+                <span><%= track.name %></span>
+              </button>
+            </li>
+          <% end %>
+        </ul>
+      </div>
     </div>
   </div>
 </section>
