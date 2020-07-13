@@ -34,11 +34,16 @@ defmodule LocalAssistant.Player do
     do: command(MopidyWS.API.Library, :browse, [uri])
 
   def play(uri) do
-    # command(MopidyWS.API.Tracklist, :clear, [])
     [%MopidyWS.Models.TlTrack{tlid: tlid}] =
       command(MopidyWS.API.Tracklist, :add, [nil, nil, [uri]])
+
     command(MopidyWS.API.Playback, :play, [nil, tlid])
   end
+
+  def get_playlist(), do: command(MopidyWS.API.Tracklist, :get_tl_tracks, [])
+
+  def delete_from_playlist(tlid),
+    do: command(MopidyWS.API.Tracklist, :remove, [%{"tlid" => [String.to_integer(tlid)]}])
 
   defp command(module, function, args),
     do: GenServer.call(__MODULE__, {:command, {module, function, args}})

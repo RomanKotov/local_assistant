@@ -1,0 +1,29 @@
+<div class="modal <%= if @modal == "playlist", do: "is-active" %>">
+  <div class="modal-background" phx-click="close_modal"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <button class="delete" aria-label="close" phx-click="close_modal"></button>
+    </header>
+    <section class="modal-card-body">
+      <ul class="menu-list">
+        <%= for tl_track <- @playlist do %>
+          <li>
+            <button
+              class="button is-fullwidth is-large"
+              phx-click="delete_from_playlist"
+              phx-value-tlid="<%= tl_track.tlid %>"
+            >
+              <span><%= tl_track.track.name %></span>
+              <span class="icon is-small">
+                <i class="fas fa-times"></i>
+              </span>
+            </button>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button" phx-click="close_modal">Cancel</button>
+    </footer>
+  </div>
+</div>

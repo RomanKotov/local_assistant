@@ -7,7 +7,9 @@ defmodule LocalAssistantWeb.PlayerLive do
       socket
       |> assign(action: Map.get(session, "action", "index"))
       |> assign(player: LocalAssistant.Player.get_state())
-      |> load_tracks(nil)
+      |> browse(nil)
+      |> load_playlist()
+      |> assign(modal: nil)
 
     if connected?(socket) do
       LocalAssistant.Player.subscribe()
@@ -22,7 +24,10 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
-  def handle_info(%{event: "player_state", payload: %LocalAssistant.Player.State{} = player}, socket) do
+  def handle_info(
+        %{event: "player_state", payload: %LocalAssistant.Player.State{} = player},
+        socket
+      ) do
     {:noreply, socket |> assign(player: player)}
   end
 
@@ -33,15 +38,36 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
-  def handle_event("open_folder", %{"uri" => uri}, socket) do
-    {:noreply, load_tracks(socket, uri)}
-  end
+  def handle_event("open_folder", %{"uri" => uri}, socket), do: {:noreply, browse(socket, uri)}
 
   @impl true
   def handle_event("play_file", %{"uri" => uri}, socket) do
     LocalAssistant.Player.play(uri)
-    {:noreply, load_tracks(socket, nil)}
+    {:noreply, browse(socket, nil)}
   end
 
-  defp load_tracks(socket, uri), do: socket |> assign(tracks: LocalAssistant.Player.browse(uri))
+  @impl true
+  def handle_event("delete_from_playlist", %{"tlid" => tlid}, socket) do
+    LocalAssistant.Player.delete_from_playlist(tlid)
+    {:noreply, load_playlist(socket)}
+  end
+
+  @impl true
+  def handle_event("open_browse_modal", _, socket) do
+    socket = socket |> assign(modal: "browse") |> browse(nil)
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("open_playlist_modal", _, socket) do
+    socket = socket |> assign(modal: "playlist") |> load_playlist()
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("close_modal", _, socket), do: {:noreply, assign(socket, modal: nil)}
+
+  defp browse(socket, uri), do: socket |> assign(tracks: LocalAssistant.Player.browse(uri))
+
+  defp load_playlist(socket), do: socket |> assign(playlist: LocalAssistant.Player.get_playlist())
 end

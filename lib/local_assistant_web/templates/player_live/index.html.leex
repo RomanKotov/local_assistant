@@ -1,27 +1,30 @@
+<%= render LocalAssistantWeb.PlayerLiveView, "_browse_modal.html", assigns %>
+<%= render LocalAssistantWeb.PlayerLiveView, "_playlist_modal.html", assigns %>
 <section class="hero has-text-centered is-fullheight">
   <div class="hero-body">
     <div class="container">
       <h1 class="title is-1">
-        MP3 Player
+        <p class="title is-3"><%= @player.track.name %></p>
       </h1>
-      <div class="subtitle">
-        <ul class="menu-list">
-          <%= for track <- @tracks do %>
-            <li>
-              <button
-                class="button"
-                phx-click="<%= if track.type == "directory", do: "open_folder", else: "play_file" %>"
-                phx-value-uri="<%= track.uri %>"
-              >
-                <span class="icon">
-                  <i class="fas fa-<%= if track.type == "directory", do: "folder", else: "file" %>"></i>
-                </span>
-                <span><%= track.name %></span>
-              </button>
-            </li>
-          <% end %>
-        </ul>
+      <div class="subtitle notification has-text-centered">
+        <%= render LocalAssistantWeb.PlayerLiveView, "_player_controls.html", assigns %>
       </div>
+      <nav class="level is-mobile">
+        <div class="level-left">
+          <button class="button is-large" phx-click="open_browse_modal">
+            <span class="icon is-large">
+              <i class="fas fa-folder"></i>
+            </span>
+          </button>
+        </div>
+        <div class="level-right">
+          <button class="button is-large" phx-click="open_playlist_modal">
+            <span class="icon is-large">
+              <i class="fas fa-list"></i>
+            </span>
+          </button>
+        </div>
+      </nav>
     </div>
   </div>
 </section>
