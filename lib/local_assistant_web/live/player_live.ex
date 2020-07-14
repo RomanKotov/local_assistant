@@ -53,6 +53,12 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
+  def handle_event("set_volume", %{"value" => value}, socket) do
+    value |> String.to_integer() |> LocalAssistant.Player.set_volume()
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("previous_track", _, socket) do
     LocalAssistant.Player.previous_track()
     {:noreply, socket}

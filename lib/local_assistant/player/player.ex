@@ -48,6 +48,8 @@ defmodule LocalAssistant.Player do
 
   def seek(value), do: command(MopidyWS.API.Playback, :seek, [value])
 
+  def set_volume(value), do: command(MopidyWS.API.Mixer, :set_volume, [value])
+
   def previous_track(), do: command(MopidyWS.API.Playback, :previous, [])
 
   def next_track(), do: command(MopidyWS.API.Playback, :next, [])
@@ -133,6 +135,9 @@ defmodule LocalAssistant.Player do
 
     {:ok, position} = pid |> API.Playback.get_time_position()
     player = %{player | position: position}
+
+    {:ok, volume} = pid |> API.Mixer.get_volume()
+    player = %{player | volume: volume}
 
     refresh_state()
 
