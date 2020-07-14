@@ -44,7 +44,6 @@ defmodule LocalAssistant.Player do
 
   def delete_from_playlist(tlid) do
     command(MopidyWS.API.Tracklist, :remove, [%{"tlid" => [tlid]}])
-    refresh_state()
   end
 
   def seek(value), do: command(MopidyWS.API.Playback, :seek, [value])
@@ -59,6 +58,9 @@ defmodule LocalAssistant.Player do
   @impl true
   def init(state) do
     Process.flag(:trap_exit, true)
+
+    refresh_state()
+
     {:ok, state, {:continue, :connect}}
   end
 
@@ -132,9 +134,7 @@ defmodule LocalAssistant.Player do
     {:ok, position} = pid |> API.Playback.get_time_position()
     player = %{player | position: position}
 
-    if player_state == "playing" do
-      refresh_state()
-    end
+    refresh_state()
 
     {:noreply, update_player(state, player)}
   end
@@ -142,13 +142,12 @@ defmodule LocalAssistant.Player do
   def handle_info({:EXIT, _pid, :disconnected}, state), do: {:noreply, %{state | pid: nil}}
 
   defp refresh_state() do
-    Process.send_after(__MODULE__, :refresh_state, 1000)
+    Process.send_after(self(), :refresh_state, 1000)
   end
 
   defp connect_to_player(state, url) do
     case MopidyWS.Player.start_link(url, &process_event/1) do
       {:ok, pid} ->
-        refresh_state()
         {:ok, %{state | pid: pid}}
 
       result ->
@@ -158,13 +157,8 @@ defmodule LocalAssistant.Player do
 
   def handle_event(%{"event" => "volume_changed", "volume" => volume}), do: %{volume: volume}
 
-  def handle_event(%{"event" => "playback_state_changed", "new_state" => state}) do
-    if state == "playing" do
-      refresh_state()
-    end
-
-    %{state: state}
-  end
+  def handle_event(%{"event" => "playback_state_changed", "new_state" => state}),
+    do: %{state: state}
 
   def handle_event(%{
         "tl_track" => %MopidyWS.Models.TlTrack{track: track},
