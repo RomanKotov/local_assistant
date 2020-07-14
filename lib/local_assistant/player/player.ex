@@ -22,13 +22,13 @@ defmodule LocalAssistant.Player do
 
   def disconnect(), do: GenServer.call(__MODULE__, :disconnect)
 
-  def process_event(event), do: GenServer.call(__MODULE__, {:event, event})
+  def process_event(event), do: GenServer.cast(__MODULE__, {:event, event})
 
   def subscribe(), do: LocalAssistantWeb.Endpoint.subscribe(@topic)
 
   def get_state(), do: GenServer.call(__MODULE__, :get_state)
 
-  def toggle_state(), do: GenServer.call(__MODULE__, :toggle_state)
+  def toggle_playback(), do: GenServer.call(__MODULE__, :toggle_playback)
 
   def browse(uri),
     do: command(MopidyWS.API.Library, :browse, [uri])
@@ -79,20 +79,7 @@ defmodule LocalAssistant.Player do
   def handle_call(:get_state, _, state = %{player: player}), do: {:reply, player, state}
 
   @impl true
-  def handle_call({:event, event}, _, state) do
-    result = event |> handle_event()
-
-    new_player =
-      struct(
-        LocalAssistant.Player.State,
-        state.player |> Map.merge(result) |> Map.from_struct()
-      )
-
-    {:reply, new_player, update_player(state, new_player)}
-  end
-
-  @impl true
-  def handle_call(:toggle_state, _, state = %{pid: pid, player: player}) do
+  def handle_call(:toggle_playback, _, state = %{pid: pid, player: player}) do
     {:ok, response} =
       case player.state do
         "playing" -> MopidyWS.API.Playback.pause(pid)
@@ -108,6 +95,19 @@ defmodule LocalAssistant.Player do
     {:ok, response} = apply(module, function, [pid | args])
 
     {:reply, response, state}
+  end
+
+  @impl true
+  def handle_cast({:event, event}, state) do
+    result = event |> handle_event()
+
+    new_player =
+      struct(
+        LocalAssistant.Player.State,
+        state.player |> Map.merge(result) |> Map.from_struct()
+      )
+
+    {:noreply, update_player(state, new_player)}
   end
 
   @impl true

@@ -33,7 +33,7 @@ defmodule LocalAssistantWeb.PlayerLive do
 
   @impl true
   def handle_event("toggle_state", _, socket) do
-    LocalAssistant.Player.toggle_state()
+    LocalAssistant.Player.toggle_playback()
     {:noreply, socket}
   end
 
