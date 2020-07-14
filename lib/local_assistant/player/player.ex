@@ -40,10 +40,12 @@ defmodule LocalAssistant.Player do
     command(MopidyWS.API.Playback, :play, [nil, tlid])
   end
 
-  def get_playlist(), do: command(MopidyWS.API.Tracklist, :get_tl_tracks, [])
+  def get_tracklist(), do: command(MopidyWS.API.Tracklist, :get_tl_tracks, [])
 
-  def delete_from_playlist(tlid),
-    do: command(MopidyWS.API.Tracklist, :remove, [%{"tlid" => [String.to_integer(tlid)]}])
+  def delete_from_playlist(tlid) do
+    command(MopidyWS.API.Tracklist, :remove, [%{"tlid" => [String.to_integer(tlid)]}])
+    refresh_state()
+  end
 
   defp command(module, function, args),
     do: GenServer.call(__MODULE__, {:command, {module, function, args}})
@@ -134,7 +136,7 @@ defmodule LocalAssistant.Player do
   def handle_info({:EXIT, _pid, :disconnected}, state), do: {:noreply, %{state | pid: nil}}
 
   defp refresh_state() do
-    Process.send_after(self(), :refresh_state, 1000)
+    Process.send_after(__MODULE__, :refresh_state, 1000)
   end
 
   defp connect_to_player(state, url) do

@@ -69,5 +69,5 @@ defmodule LocalAssistantWeb.PlayerLive do
 
   defp browse(socket, uri), do: socket |> assign(tracks: LocalAssistant.Player.browse(uri))
 
-  defp load_playlist(socket), do: socket |> assign(playlist: LocalAssistant.Player.get_playlist())
+  defp load_playlist(socket), do: socket |> assign(playlist: LocalAssistant.Player.get_tracklist())
 end
