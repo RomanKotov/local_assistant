@@ -49,6 +49,10 @@ defmodule LocalAssistant.Player do
 
   def seek(value), do: command(MopidyWS.API.Playback, :seek, [value])
 
+  def previous_track(), do: command(MopidyWS.API.Playback, :previous, [])
+
+  def next_track(), do: command(MopidyWS.API.Playback, :next, [])
+
   defp command(module, function, args),
     do: GenServer.call(__MODULE__, {:command, {module, function, args}})
 

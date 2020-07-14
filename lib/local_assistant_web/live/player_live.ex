@@ -53,6 +53,18 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
+  def handle_event("previous_track", _, socket) do
+    LocalAssistant.Player.previous_track()
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("next_track", _, socket) do
+    LocalAssistant.Player.next_track()
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("delete_from_playlist", %{"tlid" => tlid}, socket) do
     tlid |> String.to_integer() |> LocalAssistant.Player.delete_from_playlist()
     {:noreply, load_playlist(socket)}

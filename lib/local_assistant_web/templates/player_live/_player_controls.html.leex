@@ -1,8 +1,22 @@
-<button class="button is-primary is-large" phx-click="toggle_state">
-  <span class="icon is-large">
-    <i class="fas fa-<%= if @player.state == "playing", do: "pause", else: "play" %>"></i>
-  </span>
-</button>
+<div class="level is-mobile">
+  <div class="level-left">
+    <button class="button is-primary is-large" phx-click="previous_track">
+      <span class="icon is-large">
+        <i class="fas fa-fast-backward"></i>
+      </span>
+    </button>
+    <button class="button is-primary is-large" phx-click="toggle_state">
+      <span class="icon is-large">
+        <i class="fas fa-<%= if @player.state == "playing", do: "pause", else: "play" %>"></i>
+      </span>
+    </button>
+    <button class="button is-primary is-large" phx-click="next_track">
+      <span class="icon is-large">
+        <i class="fas fa-fast-forward"></i>
+      </span>
+    </button>
+  </div>
+</div>
 <input
   class="slider is-large is-fullwidth is-circle is-primary"
   step="1"
