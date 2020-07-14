@@ -3,4 +3,13 @@
     <i class="fas fa-<%= if @player.state == "playing", do: "pause", else: "play" %>"></i>
   </span>
 </button>
-<progress class="progress is-primary" value="<%= @player.position %>" max="<%= @player.track.length %>"><%= @player.position %></progress>
+<input
+  class="slider is-large is-fullwidth is-circle is-primary"
+  step="1"
+  min="0"
+  max="<%= @player.track.length %>"
+  type="range"
+  value="<%= @player.position %>"
+  phx-click="seek"
+>
+</input>

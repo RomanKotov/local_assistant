@@ -47,8 +47,14 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
+  def handle_event("seek", %{"value" => value}, socket) do
+    value |> String.to_integer() |> LocalAssistant.Player.seek()
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("delete_from_playlist", %{"tlid" => tlid}, socket) do
-    LocalAssistant.Player.delete_from_playlist(tlid)
+    tlid |> String.to_integer() |> LocalAssistant.Player.delete_from_playlist()
     {:noreply, load_playlist(socket)}
   end
 
@@ -69,5 +75,6 @@ defmodule LocalAssistantWeb.PlayerLive do
 
   defp browse(socket, uri), do: socket |> assign(tracks: LocalAssistant.Player.browse(uri))
 
-  defp load_playlist(socket), do: socket |> assign(playlist: LocalAssistant.Player.get_tracklist())
+  defp load_playlist(socket),
+    do: socket |> assign(playlist: LocalAssistant.Player.get_tracklist())
 end
