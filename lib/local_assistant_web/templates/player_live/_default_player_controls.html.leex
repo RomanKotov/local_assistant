@@ -13,12 +13,14 @@
     <i class="fas fa-fast-forward"></i>
   </span>
 </button>
-<input
-  class="slider is-large is-fullwidth is-circle is-primary"
-  step="1"
-  min="0"
-  max="<%= @player.track.length %>"
-  type="range"
-  value="<%= @player.position %>"
-  phx-click="seek"
->
+<form phx-change="seek">
+  <input
+    class="slider is-large is-fullwidth is-circle is-primary"
+    step="1"
+    min="0"
+    name="value"
+    max="<%= @player.track.length %>"
+    type="range"
+    value="<%= @player.position %>"
+  >
+</form>

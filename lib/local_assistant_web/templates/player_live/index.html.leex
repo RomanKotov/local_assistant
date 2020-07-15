@@ -9,18 +9,20 @@
       </marquee>
       <div class="subtitle notification has-text-centered">
         <%= render "_default_player_controls.html", assigns %>
-        <div class="level is-mobile">
-          <span class="icon is-large"><i class="fas fa-volume-up"></i></span>
-          <input
-            class="slider is-large is-circle has-output"
-            step="1"
-            min="0"
-            max="100"
-            type="range"
-            value="<%= @player.volume %>"
-            phx-click="set_volume"
-          >
-        </div>
+        <form phx-change="set_volume">
+          <div class="level is-mobile">
+            <span class="icon is-large"><i class="fas fa-volume-up"></i></span>
+            <input
+              class="slider is-large is-circle has-output"
+              step="1"
+              name="value"
+              min="0"
+              max="100"
+              type="range"
+              value="<%= @player.volume %>"
+            >
+          </div>
+        </form>
       </div>
       <nav class="level is-mobile">
         <div class="level-left">
