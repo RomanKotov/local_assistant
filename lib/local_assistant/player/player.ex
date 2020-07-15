@@ -127,21 +127,25 @@ defmodule LocalAssistant.Player do
 
   @impl true
   def handle_info(:refresh_state, state = %{pid: pid, player: player}) do
-    {:ok, player_state} = pid |> API.Playback.get_state()
-    player = %{player | state: player_state}
-
-    {:ok, track} = pid |> API.Playback.get_current_track()
-    player = %{player | track: track}
-
-    {:ok, position} = pid |> API.Playback.get_time_position()
-    player = %{player | position: position}
-
-    {:ok, volume} = pid |> API.Mixer.get_volume()
-    player = %{player | volume: volume}
+    new_player =
+      %{
+        state: &API.Playback.get_state/1,
+        track: &API.Playback.get_current_track/1,
+        position: &API.Playback.get_time_position/1,
+        volume: &API.Mixer.get_volume/1,
+        stream_title: &API.Playback.get_stream_title/1,
+      }
+      |> Enum.reduce(
+        player,
+        fn {key, getter}, acc ->
+          {:ok, value} = getter.(pid)
+          acc |> Map.replace!(key, value)
+        end
+      )
 
     refresh_state()
 
-    {:noreply, update_player(state, player)}
+    {:noreply, update_player(state, new_player)}
   end
 
   def handle_info({:EXIT, _pid, :disconnected}, state), do: {:noreply, %{state | pid: nil}}
