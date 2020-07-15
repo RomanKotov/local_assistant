@@ -6,6 +6,8 @@ defmodule LocalAssistant.Player.State do
     volume: 0,
     position: 0,
     repeat: false,
+    single: false,
+    consume: false,
     tlid: nil,
   ]
 
@@ -16,6 +18,8 @@ defmodule LocalAssistant.Player.State do
     position: integer(),
     stream_title: String.t() | nil,
     repeat: boolean(),
+    single: boolean(),
+    consume: boolean(),
     tlid: integer() | nil,
   }
 end

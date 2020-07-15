@@ -5,26 +5,57 @@
     <div class="container">
       <h1 class="title is-3"><%= @player.track.name %></h1>
       <h2 class="subtitle is-4"><%= @player.stream_title %></p>
-      <div class="subtitle notification has-text-centered">
-        <%= render "_default_player_controls.html", assigns %>
-        <%= render "_extra_player_controls.html", assigns %>
-      </div>
-      <nav class="level is-mobile">
-        <div class="level-left">
-          <button class="button is-large" phx-click="open_browse_modal">
+        <div class="subtitle notification has-text-centered">
+          <%= render "_default_player_controls.html", assigns %>
+          <div class="level is-mobile">
+            <span class="icon is-large"><i class="fas fa-volume-up"></i></span>
+            <input
+              class="slider is-large is-circle has-output"
+              step="1"
+              min="0"
+              max="100"
+              type="range"
+              value="<%= @player.volume %>"
+              phx-click="set_volume"
+            >
+          </div>
+        </div>
+        <nav class="level is-mobile">
+          <div class="level-left">
+            <button class="button is-large" phx-click="open_browse_modal">
+              <span class="icon is-large">
+                <i class="fas fa-folder"></i>
+              </span>
+            </button>
+          </div>
+          <button class="button is-primary is-large" phx-click="shuffle">
             <span class="icon is-large">
-              <i class="fas fa-folder"></i>
+              <i class="fas fa-random"></i>
             </span>
           </button>
-        </div>
-        <div class="level-right">
-          <button class="button is-large" phx-click="open_playlist_modal">
+          <button class="button is-<%= if @player.repeat, do: "success", else: "danger" %> is-inverted is-large" phx-click="toggle_repeat">
             <span class="icon is-large">
-              <i class="fas fa-list"></i>
+              <i class="fas fa-redo"></i>
             </span>
           </button>
-        </div>
-      </nav>
+          <button class="button is-<%= if @player.single, do: "success", else: "danger" %> is-inverted is-large" phx-click="toggle_single">
+            <span class="icon is-large">
+              <strong class="has-text-<%= if @player.single, do: "success", else: "danger" %>">1</strong>
+            </span>
+          </button>
+          <button class="button is-<%= if @player.consume, do: "success", else: "danger" %> is-inverted is-large" phx-click="toggle_consume">
+            <span class="icon is-large">
+              <i class="fas fa-utensils"></i>
+            </span>
+          </button>
+          <div class="level-right">
+            <button class="button is-large" phx-click="open_playlist_modal">
+              <span class="icon is-large">
+                <i class="fas fa-list"></i>
+              </span>
+            </button>
+          </div>
+        </nav>
     </div>
   </div>
 </section>

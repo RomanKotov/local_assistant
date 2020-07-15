@@ -30,6 +30,12 @@ defmodule LocalAssistant.Player do
 
   def toggle_playback(), do: GenServer.call(__MODULE__, :toggle_playback)
 
+  def toggle_repeat(), do: GenServer.call(__MODULE__, {:toggle, :repeat})
+
+  def toggle_single(), do: GenServer.call(__MODULE__, {:toggle, :single})
+
+  def toggle_consume(), do: GenServer.call(__MODULE__, {:toggle, :consume})
+
   def browse(uri),
     do: command(API.Library, :browse, [uri])
 
@@ -103,6 +109,19 @@ defmodule LocalAssistant.Player do
   end
 
   @impl true
+  def handle_call({:toggle, key}, _, state = %{pid: pid, player: player}) do
+    function = case key do
+                 :single -> &API.Tracklist.set_single/2
+                 :repeat -> &API.Tracklist.set_repeat/2
+                 :consume -> &API.Tracklist.set_consume/2
+                 end
+    value = player |> Map.fetch!(key)
+    {:ok, response} = function.(pid, !value)
+
+    {:reply, response, state}
+  end
+
+  @impl true
   def handle_call({:command, {module, function, args}}, _, state = %{pid: pid})
       when is_list(args) do
     {:ok, response} = apply(module, function, [pid | args])
@@ -134,7 +153,9 @@ defmodule LocalAssistant.Player do
         position: &API.Playback.get_time_position/1,
         volume: &API.Mixer.get_volume/1,
         stream_title: &API.Playback.get_stream_title/1,
-        repeat: &API.Tracklist.get_repeat/1
+        repeat: &API.Tracklist.get_repeat/1,
+        single: &API.Tracklist.get_single/1,
+        consume: &API.Tracklist.get_consume/1
       }
       |> Enum.reduce(
         player,

@@ -77,6 +77,17 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
+  def handle_event("toggle_" <> action, _, socket) do
+    function = case action do
+           "repeat" -> &LocalAssistant.Player.toggle_repeat/0
+           "single" -> &LocalAssistant.Player.toggle_single/0
+           "consume" -> &LocalAssistant.Player.toggle_consume/0
+          end
+    function.()
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("delete_from_playlist", %{"tlid" => tlid}, socket) do
     tlid |> String.to_integer() |> LocalAssistant.Player.delete_from_playlist()
     {:noreply, load_playlist(socket)}
