@@ -6,7 +6,7 @@
     <%= if !is_main_page(@socket) do %>
       <%= live_patch "Home", to: Routes.page_path(@socket, :index), class: "navbar-item" %>
     <% else %>
-      <%= if function_exported?(Routes, :live_dashboard_path, 2) do %>
+      <%= if function_exported?(Routes, :live_dashboard_path, 2) && @socket.host_uri.host == "127.0.0.1" do %>
         <%= link "LiveDashboard", to: Routes.live_dashboard_path(@socket, :home), class: "navbar-item" %>
       <% end %>
     <% end %>
