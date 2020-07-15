@@ -3,8 +3,10 @@
 <section class="hero has-text-centered is-fullheight">
   <div class="hero-body">
     <div class="container">
-      <h1 class="title is-3"><%= @player.track.name %></h1>
-      <h2 class="subtitle is-4"><%= @player.stream_title %></h2>
+      <marquee>
+        <h1 class="title is-3"><%= @player.track.name %></h1>
+        <h2 class="subtitle is-4"><%= @player.stream_title %></h2>
+      </marquee>
       <div class="subtitle notification has-text-centered">
         <%= render "_default_player_controls.html", assigns %>
         <div class="level is-mobile">

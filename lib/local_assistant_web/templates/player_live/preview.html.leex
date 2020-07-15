@@ -1,5 +1,7 @@
 <div class="notification has-text-centered">
-  <p class="title is-4"><%= @player.track.name %></p>
-  <p class="subtitle is-5"><%= @player.stream_title %></p>
+  <marquee>
+    <p class="title is-4"><%= @player.track.name %></p>
+    <p class="subtitle is-5"><%= @player.stream_title %></p>
+  </marquee>
   <%= render "_default_player_controls.html", assigns %>
 </div>
