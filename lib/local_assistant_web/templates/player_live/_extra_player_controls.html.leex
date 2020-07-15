@@ -1,0 +1,19 @@
+<div class="level is-mobile">
+  <button class="button is-primary is-large" phx-click="shuffle">
+    <span class="icon is-large">
+      <i class="fas fa-random"></i>
+    </span>
+  </button>
+  <span class="icon is-large">
+    <i class="fas fa-volume-up"></i>
+  </span>
+  <input
+    class="slider is-large is-circle has-output"
+    step="1"
+    min="0"
+    max="100"
+    type="range"
+    value="<%= @player.volume %>"
+    phx-click="set_volume"
+  >
+</div>

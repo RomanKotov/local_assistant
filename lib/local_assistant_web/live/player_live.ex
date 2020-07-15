@@ -71,6 +71,12 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
+  def handle_event("shuffle", _, socket) do
+    LocalAssistant.Player.shuffle()
+    {:noreply, socket}
+  end
+
+  @impl true
   def handle_event("delete_from_playlist", %{"tlid" => tlid}, socket) do
     tlid |> String.to_integer() |> LocalAssistant.Player.delete_from_playlist()
     {:noreply, load_playlist(socket)}

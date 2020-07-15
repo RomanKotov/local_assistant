@@ -4,7 +4,9 @@ defmodule LocalAssistant.Player.State do
     track: %MopidyWS.Models.Track{},
     stream_title: "",
     volume: 0,
-    position: 0
+    position: 0,
+    repeat: false,
+    tlid: nil,
   ]
 
   @type t() :: %__MODULE__{
@@ -13,5 +15,7 @@ defmodule LocalAssistant.Player.State do
     volume: integer(),
     position: integer(),
     stream_title: String.t() | nil,
+    repeat: boolean(),
+    tlid: integer() | nil,
   }
 end

@@ -31,28 +31,29 @@ defmodule LocalAssistant.Player do
   def toggle_playback(), do: GenServer.call(__MODULE__, :toggle_playback)
 
   def browse(uri),
-    do: command(MopidyWS.API.Library, :browse, [uri])
+    do: command(API.Library, :browse, [uri])
 
   def play(uri) do
-    [%MopidyWS.Models.TlTrack{tlid: tlid}] =
-      command(MopidyWS.API.Tracklist, :add, [nil, nil, [uri]])
+    [%MopidyWS.Models.TlTrack{tlid: tlid}] = command(API.Tracklist, :add, [nil, nil, [uri]])
 
-    command(MopidyWS.API.Playback, :play, [nil, tlid])
+    command(API.Playback, :play, [nil, tlid])
   end
 
-  def get_tracklist(), do: command(MopidyWS.API.Tracklist, :get_tl_tracks, [])
+  def get_tracklist(), do: command(API.Tracklist, :get_tl_tracks, [])
 
   def delete_from_playlist(tlid) do
-    command(MopidyWS.API.Tracklist, :remove, [%{"tlid" => [tlid]}])
+    command(API.Tracklist, :remove, [%{"tlid" => [tlid]}])
   end
 
-  def seek(value), do: command(MopidyWS.API.Playback, :seek, [value])
+  def shuffle(), do: command(API.Tracklist, :shuffle, [])
 
-  def set_volume(value), do: command(MopidyWS.API.Mixer, :set_volume, [value])
+  def seek(value), do: command(API.Playback, :seek, [value])
 
-  def previous_track(), do: command(MopidyWS.API.Playback, :previous, [])
+  def set_volume(value), do: command(API.Mixer, :set_volume, [value])
 
-  def next_track(), do: command(MopidyWS.API.Playback, :next, [])
+  def previous_track(), do: command(API.Playback, :previous, [])
+
+  def next_track(), do: command(API.Playback, :next, [])
 
   defp command(module, function, args),
     do: GenServer.call(__MODULE__, {:command, {module, function, args}})
@@ -94,8 +95,8 @@ defmodule LocalAssistant.Player do
   def handle_call(:toggle_playback, _, state = %{pid: pid, player: player}) do
     {:ok, response} =
       case player.state do
-        "playing" -> MopidyWS.API.Playback.pause(pid)
-        _ -> MopidyWS.API.Playback.play(pid)
+        "playing" -> API.Playback.pause(pid)
+        _ -> API.Playback.play(pid)
       end
 
     {:reply, response, state}
@@ -130,10 +131,10 @@ defmodule LocalAssistant.Player do
     new_player =
       %{
         state: &API.Playback.get_state/1,
-        track: &API.Playback.get_current_track/1,
         position: &API.Playback.get_time_position/1,
         volume: &API.Mixer.get_volume/1,
         stream_title: &API.Playback.get_stream_title/1,
+        repeat: &API.Tracklist.get_repeat/1
       }
       |> Enum.reduce(
         player,
@@ -142,6 +143,17 @@ defmodule LocalAssistant.Player do
           acc |> Map.replace!(key, value)
         end
       )
+
+    new_player =
+      with {:ok, tl_data} = API.Playback.get_current_tl_track(pid) do
+        {tlid, track} =
+          case tl_data do
+            nil -> {nil, nil}
+            %MopidyWS.Models.TlTrack{tlid: tlid, track: track} -> {tlid, track}
+          end
+
+        %{new_player | tlid: tlid, track: track}
+      end
 
     refresh_state()
 

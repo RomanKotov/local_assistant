@@ -1,5 +1,5 @@
 <div class="notification has-text-centered">
   <p class="title is-4"><%= @player.track.name %></p>
   <p class="subtitle is-5"><%= @player.stream_title %></p>
-  <%= render LocalAssistantWeb.PlayerLiveView, "_player_controls.html", assigns %>
+  <%= render "_default_player_controls.html", assigns %>
 </div>

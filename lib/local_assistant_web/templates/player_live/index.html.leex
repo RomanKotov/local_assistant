@@ -1,12 +1,13 @@
 <%= render LocalAssistantWeb.PlayerLiveView, "_browse_modal.html", assigns %>
-<%= render LocalAssistantWeb.PlayerLiveView, "_playlist_modal.html", assigns %>
+<%= render LocalAssistantWeb.PlayerLiveView, "_tracklist_modal.html", assigns %>
 <section class="hero has-text-centered is-fullheight">
   <div class="hero-body">
     <div class="container">
-      <h1 class="title is-2"><%= @player.track.name %></h1>
+      <h1 class="title is-3"><%= @player.track.name %></h1>
       <h2 class="subtitle is-4"><%= @player.stream_title %></p>
       <div class="subtitle notification has-text-centered">
-        <%= render LocalAssistantWeb.PlayerLiveView, "_player_controls.html", assigns %>
+        <%= render "_default_player_controls.html", assigns %>
+        <%= render "_extra_player_controls.html", assigns %>
       </div>
       <nav class="level is-mobile">
         <div class="level-left">
