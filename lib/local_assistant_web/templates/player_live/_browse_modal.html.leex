@@ -28,7 +28,6 @@
       </ul>
     </section>
     <footer class="modal-card-foot">
-      <button class="button is-large" phx-click="close_modal">Cancel</button>
       <%= if @current_uri do %>
         <button class="button is-large is-warning" phx-click="back">
           <span class="icon">
@@ -46,6 +45,7 @@
           <i class="fas fa-plus"></i>
         </span>
       </button>
+      <button class="button is-large" phx-click="close_modal">Cancel</button>
     </footer>
   </div>
 </div>

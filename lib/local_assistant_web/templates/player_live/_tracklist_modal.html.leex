@@ -1,4 +1,4 @@
-<div class="modal <%= if @modal == "playlist", do: "is-active" %>">
+<div class="modal <%= if @modal == "tracklist", do: "is-active" %>">
   <div class="modal-background" phx-click="close_modal"></div>
   <div class="modal-card">
     <header class="modal-card-head">
@@ -23,7 +23,12 @@
       </ul>
     </section>
     <footer class="modal-card-foot">
-      <button class="button" phx-click="close_modal">Cancel</button>
+      <button class="button is-large is-danger" phx-click="clear_tracklist">
+        <span class="icon">
+          <i class="fas fa-broom"></i>
+        </span>
+      </button>
+      <button class="button is-large" phx-click="close_modal">Cancel</button>
     </footer>
   </div>
 </div>

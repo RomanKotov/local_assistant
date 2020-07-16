@@ -16,7 +16,7 @@ defmodule LocalAssistantWeb.PlayerLive do
         player: LocalAssistant.Player.get_state()
       )
       |> browse(nil)
-      |> load_playlist()
+      |> load_tracklist()
 
     if connected?(socket) do
       LocalAssistant.Player.subscribe()
@@ -77,6 +77,12 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
+  def handle_event("clear_tracklist", _, socket) do
+    LocalAssistant.Player.clear_tracklist()
+    {:noreply, load_tracklist(socket)}
+  end
+
+  @impl true
   def handle_event("seek", %{"value" => value}, socket) do
     value |> String.to_integer() |> LocalAssistant.Player.seek()
     {:noreply, socket}
@@ -107,9 +113,9 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
-  def handle_event("delete_from_playlist", %{"tlid" => tlid}, socket) do
-    [String.to_integer(tlid)] |> LocalAssistant.Player.delete_from_playlist()
-    {:noreply, load_playlist(socket)}
+  def handle_event("delete_from_tracklist", %{"tlid" => tlid}, socket) do
+    [String.to_integer(tlid)] |> LocalAssistant.Player.delete_from_tracklist()
+    {:noreply, load_tracklist(socket)}
   end
 
   @impl true
@@ -119,8 +125,8 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
-  def handle_event("open_playlist_modal", _, socket) do
-    socket = socket |> assign(modal: "playlist") |> load_playlist()
+  def handle_event("open_tracklist_modal", _, socket) do
+    socket = socket |> assign(modal: "tracklist") |> load_tracklist()
     {:noreply, socket}
   end
 
@@ -141,7 +147,7 @@ defmodule LocalAssistantWeb.PlayerLive do
     )
   end
 
-  defp load_playlist(socket) do
+  defp load_tracklist(socket) do
     tracklist = LocalAssistant.Player.get_tracklist()
     uris_in_tracklist = tracklist |> Enum.map(& &1.track.uri) |> MapSet.new()
 
