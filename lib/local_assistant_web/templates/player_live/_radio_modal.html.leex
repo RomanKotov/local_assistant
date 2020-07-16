@@ -1,0 +1,26 @@
+<div class="modal <%= if @modal == "radio", do: "is-active" %>">
+  <div class="modal-background" phx-click="close_modal"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <button class="delete" aria-label="close" phx-click="close_modal"></button>
+    </header>
+    <section class="modal-card-body">
+      <ul class="menu-list">
+        <%= for uri <- @radio_uris do %>
+          <li>
+            <button
+              class="button is-fullwidth is-large <%= if MapSet.member?(@uris_in_tracklist, uri), do: "is-info is-light" %>"
+              phx-click="play_radio"
+              phx-value-uri="<%= uri %>"
+            >
+              <span><%= uri %></span>
+            </button>
+          </li>
+        <% end %>
+      </ul>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button is-large" phx-click="close_modal">Cancel</button>
+    </footer>
+  </div>
+</div>

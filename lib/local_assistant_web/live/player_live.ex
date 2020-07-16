@@ -14,7 +14,8 @@ defmodule LocalAssistantWeb.PlayerLive do
         tracks: [],
         tracklist: [],
         current_uri: nil,
-        player: LocalAssistant.Player.get_state()
+        player: LocalAssistant.Player.get_state(),
+        radio_uris: load_radio_uris()
       )
 
     if connected?(socket) do
@@ -46,6 +47,12 @@ defmodule LocalAssistantWeb.PlayerLive do
   @impl true
   def handle_event("open_folder", %{"uri" => uri}, socket) do
     {:noreply, browse(socket, uri)}
+  end
+
+  @impl true
+  def handle_event("play_radio", %{"uri" => uri}, socket) do
+    LocalAssistant.Player.play_single(uri)
+    {:noreply, assign(socket, modal: nil)}
   end
 
   @impl true
@@ -132,6 +139,9 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
+  def handle_event("open_radio_modal", _, socket), do: {:noreply, assign(socket, modal: "radio")}
+
+  @impl true
   def handle_event("open_tracklist_modal", _, socket) do
     socket = socket |> assign(modal: "tracklist") |> load_tracklist()
     {:noreply, socket}
@@ -163,5 +173,19 @@ defmodule LocalAssistantWeb.PlayerLive do
       tracklist: tracklist,
       uris_in_tracklist: uris_in_tracklist
     )
+  end
+
+  defp load_radio_uris() do
+    radio_path = Path.join(:code.priv_dir(:local_assistant), "radio.json")
+
+    if File.exists?(radio_path) do
+      with path <- radio_path,
+           {:ok, body} <- File.read(path),
+           {:ok, json} <- Jason.decode(body) do
+        json
+      end
+    else
+      []
+    end
   end
 end

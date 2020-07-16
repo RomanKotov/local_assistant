@@ -10,7 +10,7 @@
           <li>
             <button
               class="button is-fullwidth is-large <%= if tl_track.tlid == @player.tlid, do: "is-info" %>"
-              phx-click="delete_from_playlist"
+              phx-click="delete_from_tracklist"
               phx-value-tlid="<%= tl_track.tlid %>"
             >
               <span><%= tl_track.track.name %></span>

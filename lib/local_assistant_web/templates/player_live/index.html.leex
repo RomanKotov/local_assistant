@@ -1,5 +1,6 @@
 <%= render LocalAssistantWeb.PlayerLiveView, "_browse_modal.html", assigns %>
 <%= render LocalAssistantWeb.PlayerLiveView, "_tracklist_modal.html", assigns %>
+<%= render LocalAssistantWeb.PlayerLiveView, "_radio_modal.html", assigns %>
 <section class="hero has-text-centered is-fullheight">
   <div class="hero-body">
     <div class="container">
@@ -29,6 +30,11 @@
           <button class="button is-large" phx-click="open_browse_modal">
             <span class="icon is-large">
               <i class="fas fa-folder"></i>
+            </span>
+          </button>
+          <button class="button is-large" phx-click="open_radio_modal">
+            <span class="icon is-large">
+              <i class="fas fa-podcast"></i>
             </span>
           </button>
         </div>

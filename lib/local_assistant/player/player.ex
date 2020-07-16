@@ -32,6 +32,12 @@ defmodule LocalAssistant.Player do
 
   def toggle(feature), do: GenServer.call(__MODULE__, {:toggle, feature})
 
+  def play_single(uri) do
+    clear_tracklist()
+    [%{tlid: tlid}] = add_to_tracklist([uri])
+    command(API.Playback, :play, [nil, tlid])
+  end
+
   def browse(uri),
     do: command(API.Library, :browse, [uri])
 
