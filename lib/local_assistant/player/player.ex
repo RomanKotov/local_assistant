@@ -35,10 +35,8 @@ defmodule LocalAssistant.Player do
   def browse(uri),
     do: command(API.Library, :browse, [uri])
 
-  def play(uri) do
-    [%MopidyWS.Models.TlTrack{tlid: tlid}] = command(API.Tracklist, :add, [nil, nil, [uri]])
-
-    command(API.Playback, :play, [nil, tlid])
+  def add_to_tracklist(uris) when is_list(uris) do
+    command(API.Tracklist, :add, [nil, nil, uris])
   end
 
   def get_tracklist(), do: command(API.Tracklist, :get_tl_tracks, [])

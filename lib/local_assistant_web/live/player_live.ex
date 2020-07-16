@@ -50,9 +50,30 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
-  def handle_event("play_file", %{"uri" => uri}, socket) do
-    LocalAssistant.Player.play(uri)
+  def handle_event("select_file", %{"uri" => uri}, socket = %{assigns: %{selected_uris: uris}}) do
+    function = if MapSet.member?(uris, uri), do: &MapSet.delete/2, else: &MapSet.put/2
+    socket = socket |> assign(selected_uris: function.(uris, uri))
+    {:noreply, socket}
+  end
+
+  @impl true
+  def handle_event("add_to_tracklist", _, socket = %{assigns: %{selected_uris: uris}}) do
+    uris |> MapSet.to_list() |> LocalAssistant.Player.add_to_tracklist()
     {:noreply, browse(socket, nil)}
+  end
+
+  @impl true
+  def handle_event("select_all", _, socket = %{assigns: %{tracks: tracks, selected_uris: uris}}) do
+    file_uris = for t <- tracks, "track" == t.type, into: MapSet.new() do t.uri end
+    diff = file_uris |> MapSet.difference(uris)
+    selected_uris = if Enum.empty?(diff), do: MapSet.new(), else: file_uris
+    {:noreply, assign(socket, selected_uris: selected_uris)}
+  end
+
+  @impl true
+  def handle_event("back", _, socket = %{assigns: %{current_uri: current, parent_folders: parents}}) do
+    previous_uri = Map.get(parents, current)
+    {:noreply, browse(socket, previous_uri)}
   end
 
   @impl true

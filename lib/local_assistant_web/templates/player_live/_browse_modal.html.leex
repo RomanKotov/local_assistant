@@ -9,21 +9,43 @@
         <%= for track <- @tracks do %>
           <li>
             <button
-              class="button is-fullwidth is-large <%= if MapSet.member?(@uris_in_tracklist, track.uri), do: "is-info" %>"
-              phx-click="<%= if track.type == "directory", do: "open_folder", else: "play_file" %>"
+              class="button is-fullwidth is-large <%= if MapSet.member?(@uris_in_tracklist, track.uri), do: "is-info is-light" %>"
+              phx-click="<%= if track.type == "directory", do: "open_folder", else: "select_file" %>"
               phx-value-uri="<%= track.uri %>"
             >
               <span class="icon">
                 <i class="fas fa-<%= if track.type == "directory", do: "folder", else: "file" %>"></i>
               </span>
               <span><%= track.name %></span>
+              <%= if MapSet.member?(@selected_uris, track.uri) do %>
+                <span class="icon">
+                  <i class="fas fa-check"></i>
+                </span>
+              <% end %>
             </button>
           </li>
         <% end %>
       </ul>
     </section>
     <footer class="modal-card-foot">
-      <button class="button" phx-click="close_modal">Cancel</button>
+      <button class="button is-large" phx-click="close_modal">Cancel</button>
+      <%= if @current_uri do %>
+        <button class="button is-large is-warning" phx-click="back">
+          <span class="icon">
+            <i class="fas fa-arrow-left"></i>
+          </span>
+        </button>
+      <% end %>
+      <button class="button is-large is-info" phx-click="select_all">
+        <span class="icon">
+          <i class="fas fa-check"></i>
+        </span>
+      </button>
+      <button class="button is-large is-success" phx-click="add_to_tracklist">
+        <span class="icon">
+          <i class="fas fa-plus"></i>
+        </span>
+      </button>
     </footer>
   </div>
 </div>
