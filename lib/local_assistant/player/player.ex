@@ -43,8 +43,8 @@ defmodule LocalAssistant.Player do
 
   def get_tracklist(), do: command(API.Tracklist, :get_tl_tracks, [])
 
-  def delete_from_playlist(tlid) do
-    command(API.Tracklist, :remove, [%{"tlid" => [tlid]}])
+  def delete_from_playlist(tlids) when is_list(tlids) do
+    command(API.Tracklist, :remove, [%{"tlid" => tlids}])
   end
 
   def seek(value), do: command(API.Playback, :seek, [value])

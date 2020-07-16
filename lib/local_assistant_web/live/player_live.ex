@@ -5,11 +5,18 @@ defmodule LocalAssistantWeb.PlayerLive do
   def mount(_params, session, socket) do
     socket =
       socket
-      |> assign(action: Map.get(session, "action", "index"))
-      |> assign(player: LocalAssistant.Player.get_state())
+      |> assign(
+        action: Map.get(session, "action", "index"),
+        modal: nil,
+        parent_folders: %{},
+        selected_uris: MapSet.new(),
+        uris_in_tracklist: MapSet.new(),
+        tracks: [],
+        current_uri: nil,
+        player: LocalAssistant.Player.get_state()
+      )
       |> browse(nil)
       |> load_playlist()
-      |> assign(modal: nil)
 
     if connected?(socket) do
       LocalAssistant.Player.subscribe()
@@ -38,7 +45,9 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
-  def handle_event("open_folder", %{"uri" => uri}, socket), do: {:noreply, browse(socket, uri)}
+  def handle_event("open_folder", %{"uri" => uri}, socket) do
+    {:noreply, browse(socket, uri)}
+  end
 
   @impl true
   def handle_event("play_file", %{"uri" => uri}, socket) do
@@ -78,7 +87,7 @@ defmodule LocalAssistantWeb.PlayerLive do
 
   @impl true
   def handle_event("delete_from_playlist", %{"tlid" => tlid}, socket) do
-    tlid |> String.to_integer() |> LocalAssistant.Player.delete_from_playlist()
+    [String.to_integer(tlid)] |> LocalAssistant.Player.delete_from_playlist()
     {:noreply, load_playlist(socket)}
   end
 
@@ -97,8 +106,28 @@ defmodule LocalAssistantWeb.PlayerLive do
   @impl true
   def handle_event("close_modal", _, socket), do: {:noreply, assign(socket, modal: nil)}
 
-  defp browse(socket, uri), do: socket |> assign(tracks: LocalAssistant.Player.browse(uri))
+  defp browse(socket, uri) do
+    tracks = LocalAssistant.Player.browse(uri)
+    parents = tracks |> Enum.map(&{&1.uri, uri}) |> Enum.into(%{})
+    parent_folders = socket.assigns.parent_folders |> Map.merge(parents)
 
-  defp load_playlist(socket),
-    do: socket |> assign(playlist: LocalAssistant.Player.get_tracklist())
+    assign(
+      socket,
+      tracks: tracks,
+      current_uri: uri,
+      parent_folders: parent_folders,
+      selected_uris: MapSet.new()
+    )
+  end
+
+  defp load_playlist(socket) do
+    tracklist = LocalAssistant.Player.get_tracklist()
+    uris_in_tracklist = tracklist |> Enum.map(& &1.track.uri) |> MapSet.new()
+
+    assign(
+      socket,
+      tracklist: tracklist,
+      uris_in_tracklist: uris_in_tracklist
+    )
+  end
 end

@@ -6,7 +6,7 @@
     </header>
     <section class="modal-card-body">
       <ul class="menu-list">
-        <%= for tl_track <- @playlist do %>
+        <%= for tl_track <- @tracklist do %>
           <li>
             <button
               class="button is-fullwidth is-large <%= if tl_track.tlid == @player.tlid, do: "is-info" %>"
