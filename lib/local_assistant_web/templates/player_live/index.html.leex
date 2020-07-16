@@ -32,7 +32,7 @@
             </span>
           </button>
         </div>
-        <button class="button is-primary is-large" phx-click="shuffle">
+        <button class="button is-<%= if @player.random, do: "success", else: "danger" %> is-inverted is-large" phx-click="toggle_random">
           <span class="icon is-large">
             <i class="fas fa-random"></i>
           </span>

@@ -8,6 +8,7 @@ defmodule LocalAssistant.Player.State do
     repeat: false,
     single: false,
     consume: false,
+    random: false,
     tlid: nil,
   ]
 
@@ -20,6 +21,7 @@ defmodule LocalAssistant.Player.State do
     repeat: boolean(),
     single: boolean(),
     consume: boolean(),
+    random: boolean(),
     tlid: integer() | nil,
   }
 end

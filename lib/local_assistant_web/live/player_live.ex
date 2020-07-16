@@ -71,19 +71,8 @@ defmodule LocalAssistantWeb.PlayerLive do
   end
 
   @impl true
-  def handle_event("shuffle", _, socket) do
-    LocalAssistant.Player.shuffle()
-    {:noreply, socket}
-  end
-
-  @impl true
   def handle_event("toggle_" <> action, _, socket) do
-    function = case action do
-           "repeat" -> &LocalAssistant.Player.toggle_repeat/0
-           "single" -> &LocalAssistant.Player.toggle_single/0
-           "consume" -> &LocalAssistant.Player.toggle_consume/0
-          end
-    function.()
+    LocalAssistant.Player.toggle(action)
     {:noreply, socket}
   end
 
