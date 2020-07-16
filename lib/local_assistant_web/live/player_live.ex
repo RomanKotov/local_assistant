@@ -4,19 +4,18 @@ defmodule LocalAssistantWeb.PlayerLive do
   @impl true
   def mount(_params, session, socket) do
     socket =
-      socket
-      |> assign(
+      assign(
+        socket,
         action: Map.get(session, "action", "index"),
         modal: nil,
         parent_folders: %{},
         selected_uris: MapSet.new(),
         uris_in_tracklist: MapSet.new(),
         tracks: [],
+        tracklist: [],
         current_uri: nil,
         player: LocalAssistant.Player.get_state()
       )
-      |> browse(nil)
-      |> load_tracklist()
 
     if connected?(socket) do
       LocalAssistant.Player.subscribe()
@@ -64,14 +63,22 @@ defmodule LocalAssistantWeb.PlayerLive do
 
   @impl true
   def handle_event("select_all", _, socket = %{assigns: %{tracks: tracks, selected_uris: uris}}) do
-    file_uris = for t <- tracks, "track" == t.type, into: MapSet.new() do t.uri end
+    file_uris =
+      for t <- tracks, "track" == t.type, into: MapSet.new() do
+        t.uri
+      end
+
     diff = file_uris |> MapSet.difference(uris)
     selected_uris = if Enum.empty?(diff), do: MapSet.new(), else: file_uris
     {:noreply, assign(socket, selected_uris: selected_uris)}
   end
 
   @impl true
-  def handle_event("back", _, socket = %{assigns: %{current_uri: current, parent_folders: parents}}) do
+  def handle_event(
+        "back",
+        _,
+        socket = %{assigns: %{current_uri: current, parent_folders: parents}}
+      ) do
     previous_uri = Map.get(parents, current)
     {:noreply, browse(socket, previous_uri)}
   end
