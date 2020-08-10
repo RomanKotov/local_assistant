@@ -35,7 +35,8 @@ defmodule LocalAssistantWeb.PlayerLive do
         %{event: "player_state", payload: %LocalAssistant.Player.State{} = player},
         socket
       ) do
-    {:noreply, socket |> assign(player: player)}
+    page_title = player.track.name || player.stream_title
+    {:noreply, socket |> assign(player: player, page_title: page_title)}
   end
 
   @impl true
