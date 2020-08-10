@@ -1,7 +1,7 @@
 <%= for {page, index} <- Enum.with_index(@pages) do %>
   <div class="box columns is-mobile is-vcentered">
     <div class="column">
-      <%= live_render(@socket, page.component, id: index, session: %{"action" => "preview"}) %>
+      <%= live_render(@socket, page.component, id: "page-#{index}", session: %{"action" => "preview"}) %>
     </div>
     <%= live_patch to: page.route do %>
       <div class="column is-narrow-mobile">
